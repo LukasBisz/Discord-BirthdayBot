@@ -11,6 +11,7 @@ import {
   handleAdminRemoveSelect,
   handleAdminRemoveButton,
 } from "./interactions/admin/remove";
+import { handleAdminAddModal } from "./interactions/admin/add";
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -49,12 +50,16 @@ client.on("interactionCreate", async (interaction) => {
     return;
   }
 
-  if (
-    interaction.isModalSubmit() &&
-    interaction.customId === "user_add_birthday_modal"
-  ) {
-    await addInteraction(interaction);
-    return;
+  if (interaction.isModalSubmit()) {
+    if (interaction.customId === "user_add_birthday_modal") {
+      await addInteraction(interaction);
+      return;
+    }
+
+    if (interaction.customId === "admin_add_birthday_modal") {
+      await handleAdminAddModal(interaction);
+      return;
+    }
   }
 
   if (interaction.isButton()) {
