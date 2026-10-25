@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7194c4f3-1ae5-4f88-88ca-f39c24f87b45",
+  "id": "370bcc78-59f1-4006-a7bd-d7ca00c8ac9b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "birthdays": {
@@ -13,6 +13,13 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "guild_id": {
+          "name": "guild_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         },
         "birthday_id": {
           "name": "birthday_id",
@@ -94,6 +101,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": false
+        },
+        "trusted_users": {
+          "name": "trusted_users",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
         }
       },
       "indexes": {},

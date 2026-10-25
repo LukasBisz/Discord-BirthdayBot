@@ -1,14 +1,22 @@
 import { MessageFlags, ModalSubmitInteraction } from "discord.js";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { BIRTHDAY_DATE_REGEX, BIRTHDAY_YEAR_REGEX } from "../../utils/regex";
 
 export async function addInteraction(interaction: ModalSubmitInteraction) {
+  if (!interaction.guildId) {
+    return interaction.reply({
+      content: "❌ Dieser Befehl kann nur auf einem Server ausgeführt werden.",
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
   const dateStr = interaction.fields.getTextInputValue("date_input").trim();
   const yearStr = interaction.fields.getTextInputValue("year_input").trim();
 
   const userId = interaction.user.id;
+  const guildId = interaction.guildId;
 
   const dateMatch = dateStr.match(BIRTHDAY_DATE_REGEX);
 
@@ -57,7 +65,9 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
     const [existingBirthday] = await db
       .select()
       .from(birthdays)
-      .where(eq(birthdays.birthdayId, userId));
+      .where(
+        and(eq(birthdays.guildId, guildId), eq(birthdays.birthdayId, userId)),
+      );
 
     if (existingBirthday) {
       await db
@@ -68,9 +78,12 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
           year,
           addedBy: userId,
         })
-        .where(eq(birthdays.birthdayId, userId));
+        .where(
+          and(eq(birthdays.guildId, guildId), eq(birthdays.birthdayId, userId)),
+        );
     } else {
       await db.insert(birthdays).values({
+        guildId,
         birthdayId: userId,
         addedBy: userId,
         day,

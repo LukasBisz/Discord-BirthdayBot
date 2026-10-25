@@ -7,6 +7,10 @@ import { execute as executeBirthdayAdminCommand } from "./commands/birthday-admi
 import { setupInteraction } from "./interactions/admin/setup";
 import { addInteraction } from "./interactions/user/add";
 import { removeInteraction } from "./interactions/user/remove";
+import {
+  handleAdminRemoveSelect,
+  handleAdminRemoveButton,
+} from "./interactions/admin/remove";
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -38,6 +42,13 @@ client.on("interactionCreate", async (interaction) => {
     return;
   }
 
+  if (interaction.isStringSelectMenu()) {
+    if (interaction.customId === "admin_remove_birthday_select") {
+      await handleAdminRemoveSelect(interaction);
+    }
+    return;
+  }
+
   if (
     interaction.isModalSubmit() &&
     interaction.customId === "user_add_birthday_modal"
@@ -46,13 +57,19 @@ client.on("interactionCreate", async (interaction) => {
     return;
   }
 
-  if (
-    interaction.isButton() &&
-    (interaction.customId === "user_remove_birthday_confirm" ||
-      interaction.customId === "user_remove_birthday_cancel")
-  ) {
-    await removeInteraction(interaction);
-    return;
+  if (interaction.isButton()) {
+    if (
+      interaction.customId === "user_remove_birthday_confirm" ||
+      interaction.customId === "user_remove_birthday_cancel"
+    ) {
+      await removeInteraction(interaction);
+      return;
+    }
+
+    if (interaction.customId.startsWith("admin_remove_")) {
+      await handleAdminRemoveButton(interaction);
+      return;
+    }
   }
 });
 

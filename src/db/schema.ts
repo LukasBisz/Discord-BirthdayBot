@@ -2,6 +2,7 @@ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 
 export const birthdays = sqliteTable("birthdays", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  guildId: text("guild_id").notNull(),
   birthdayId: text("birthday_id").notNull(),
   addedBy: text("added_by").notNull(),
   day: integer("day").notNull(),
@@ -16,5 +17,9 @@ export const configuration = sqliteTable("configuration", {
   channelId: text("channel_id").notNull(),
   setupComplete: integer("setup_complete", { mode: "boolean" })
     .default(false)
+    .notNull(),
+  trustedUsers: text("trusted_users", { mode: "json" })
+    .$type<string[]>()
+    .default([])
     .notNull(),
 });

@@ -1,5 +1,6 @@
 CREATE TABLE `birthdays` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`guild_id` text NOT NULL,
 	`birthday_id` text NOT NULL,
 	`added_by` text NOT NULL,
 	`day` integer NOT NULL,
@@ -12,5 +13,6 @@ CREATE TABLE `configuration` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`guild_id` text NOT NULL,
 	`channel_id` text NOT NULL,
-	`setup_complete` integer DEFAULT false NOT NULL
+	`setup_complete` integer DEFAULT false NOT NULL,
+	`trusted_users` text DEFAULT '[]' NOT NULL
 );
