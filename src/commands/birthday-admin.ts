@@ -3,6 +3,7 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
+import { isServerSetup } from "../utils/checkSetup";
 import * as setupCommand from "./subcommands/admin/setup";
 import * as removeCommand from "./subcommands/admin/remove";
 import * as addCommand from "./subcommands/admin/add";
@@ -17,6 +18,10 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const subcommand = interaction.options.getSubcommand();
+
+  if (subcommand !== "setup") {
+    if (!(await isServerSetup(interaction))) return;
+  }
 
   if (subcommand === "setup") {
     await setupCommand.execute(interaction);

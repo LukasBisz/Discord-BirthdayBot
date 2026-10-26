@@ -1,4 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { isServerSetup } from "../utils/checkSetup";
 import * as addCommand from "./subcommands/user/add";
 import * as removeCommand from "./subcommands/user/remove";
 
@@ -9,6 +10,7 @@ export const data = new SlashCommandBuilder()
   .addSubcommand((subcommand) => removeCommand.registerSubcommand(subcommand));
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  if (!(await isServerSetup(interaction))) return;
   const subcommand = interaction.options.getSubcommand();
 
   if (subcommand === "add") {
