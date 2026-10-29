@@ -7,6 +7,7 @@ import {
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { eq, and } from "drizzle-orm";
+import { announceBirthday } from "../../jobs/birthdayJob";
 
 export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
   if (!interaction.guildId) {
@@ -115,6 +116,12 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
       content: `🎉 Der Geburtstag von **${displayName}** wurde erfolgreich auf den **${dateDisplay}** gespeichert!`,
       flags: MessageFlags.Ephemeral,
     });
+
+    const now = new Date();
+    const isToday = day === now.getDate() && month === now.getMonth() + 1;
+    if (isToday) {
+      await announceBirthday(interaction.client, guildId, targetInput, year)
+    }
   } catch (error) {
     console.error("❌ Fehler beim Speichern des Geburtstags:", error);
     await interaction.reply({

@@ -12,6 +12,7 @@ import {
   handleAdminRemoveButton,
 } from "./interactions/admin/remove";
 import { handleAdminAddModal } from "./interactions/admin/add";
+import { startBirthdayJob } from "./jobs/birthdayJob";
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -21,6 +22,7 @@ client.on("clientReady", async (c) => {
   console.log("────────────────────────────────────────");
   await registerCommands();
   console.log("────────────────────────────────────────");
+  startBirthdayJob(client);
   console.log(`✅ ${c.user.username} is online! 🤖`);
   console.log("────────────────────────────────────────");
 });

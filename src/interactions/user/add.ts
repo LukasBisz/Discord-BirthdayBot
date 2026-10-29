@@ -3,6 +3,7 @@ import { eq, and } from "drizzle-orm";
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { BIRTHDAY_DATE_REGEX, BIRTHDAY_YEAR_REGEX } from "../../utils/regex";
+import { announceBirthday } from "../../jobs/birthdayJob";
 
 export async function addInteraction(interaction: ModalSubmitInteraction) {
   if (!interaction.guildId) {
@@ -102,6 +103,13 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
       content: `🎉 Dein Geburtstag wurde erfolgreich auf den **${dateDisplay}** gespeichert!`,
       flags: MessageFlags.Ephemeral,
     });
+
+    const now = new Date();
+    const isToday = day === now.getDate() && month === now.getMonth() + 1;
+
+    if (isToday) {
+      await announceBirthday(interaction.client, guildId, userId, year);
+    }
   } catch (error) {
     console.error("❌ Fehler beim Speichern des Geburtstags:", error);
     await interaction.reply({
