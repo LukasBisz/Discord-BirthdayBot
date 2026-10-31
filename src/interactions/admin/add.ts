@@ -66,12 +66,12 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
     });
   }
 
-  let displayName = targetInput;
+  let displayName = `**${targetInput}**`;
   if (DISCORD_ID_REGEX.test(targetInput)) {
     const user = await interaction.client.users
       .fetch(targetInput)
       .catch(() => null);
-    if (user) displayName = `@${user.username}`;
+    if (user) displayName = `<@${user.id}>`;
   }
 
   try {
@@ -113,14 +113,14 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
       : `${formattedDay}.${formattedMonth}.`;
 
     await interaction.reply({
-      content: `🎉 Der Geburtstag von **${displayName}** wurde erfolgreich auf den **${dateDisplay}** gespeichert!`,
+      content: `🎉 Der Geburtstag von ${displayName} wurde erfolgreich auf den **${dateDisplay}** gespeichert!`,
       flags: MessageFlags.Ephemeral,
     });
 
     const now = new Date();
     const isToday = day === now.getDate() && month === now.getMonth() + 1;
     if (isToday) {
-      await announceBirthday(interaction.client, guildId, targetInput, year)
+      await announceBirthday(interaction.client, guildId, targetInput, year);
     }
   } catch (error) {
     console.error("❌ Fehler beim Speichern des Geburtstags:", error);
