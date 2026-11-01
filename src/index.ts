@@ -1,7 +1,8 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { Client, GatewayIntentBits, GuildWidgetStyle } from "discord.js";
 import { config } from "./config";
 import { connectToDatabase } from "./db/connection";
-import { registerCommands } from "./registerCommands";
+import { registerCommands, registerCommandsForGuild } from "./registerCommands";
+import { initGuild, syncGuild, cleanupGuild } from "./db/guilds";
 import { execute as executeBirthdayCommand } from "./commands/birthday";
 import { execute as executeBirthdayAdminCommand } from "./commands/birthday-admin";
 import { setupInteraction } from "./interactions/admin/setup";
@@ -20,11 +21,27 @@ client.on("clientReady", async (c) => {
   console.log("────────────────────────────────────────");
   await connectToDatabase();
   console.log("────────────────────────────────────────");
-  await registerCommands();
+  await registerCommands(client);
+  console.log("────────────────────────────────────────");
+  await syncGuild(client);
   console.log("────────────────────────────────────────");
   startBirthdayJob(client);
   console.log(`✅ ${c.user.username} is online! 🤖`);
   console.log("────────────────────────────────────────");
+});
+
+client.on("guildCreate", async (guild) => {
+  console.log(`🚀 Neuem Server beigetreten: "${guild.name}" (${guild.id})`);
+  if (client.user) {
+    await registerCommandsForGuild(guild.id, client.user.id);
+  }
+  await initGuild(guild.id);
+});
+
+client.on("guildDelete", async (guild) => {
+  const guildName = guild.name ?? "Unbekannter Server";
+  console.log(`📤 Bot wurde von Server entfernt: "${guildName}" (${guild.id})`);
+  await cleanupGuild(guild.id);
 });
 
 client.on("interactionCreate", async (interaction) => {
