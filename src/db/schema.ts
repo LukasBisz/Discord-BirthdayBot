@@ -14,12 +14,8 @@ export const birthdays = sqliteTable("birthdays", {
 export const configuration = sqliteTable("configuration", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   guildId: text("guild_id").notNull(),
-  channelId: text("channel_id").notNull(),
+  channelId: text("channel_id"),
   setupComplete: integer("setup_complete", { mode: "boolean" })
     .default(false)
-    .notNull(),
-  trustedUsers: text("trusted_users", { mode: "json" })
-    .$type<string[]>()
-    .default([])
     .notNull(),
 });

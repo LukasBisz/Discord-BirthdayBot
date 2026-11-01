@@ -45,7 +45,7 @@ export async function announceBirthday(
       )
       .limit(1);
 
-    if (!config) {
+    if (!config || !config.channelId) {
       console.log(`⚠️ No setup for guild ${guildId}, skipping.`);
       return false;
     }
