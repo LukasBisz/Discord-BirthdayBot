@@ -1,4 +1,8 @@
-import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  MessageFlags,
+  PermissionFlagsBits,
+} from "discord.js";
 import { eq } from "drizzle-orm";
 import { db } from "../db/connection";
 import { configuration } from "../db/schema";
@@ -20,9 +24,16 @@ export async function isServerSetup(
     .where(eq(configuration.guildId, interaction.guildId));
 
   if (!config || !config.setupComplete) {
+    const isAdmin =
+      interaction.memberPermissions?.has(PermissionFlagsBits.Administrator) ??
+      false;
+
+    const messageContent = isAdmin
+      ? "⚙️ Der BirthdayBot wurde auf diesem Server noch nicht eingerichtet.\nBitte führe zuerst `/birthday-admin setup` aus, um den Zielkanal festzulegen."
+      : "⚙️ Der BirthdayBot wurde auf diesem Server noch nicht eingerichtet.\nBitte wende dich an einen Administrator, um die Einrichtung abzuschließen.";
+
     await interaction.reply({
-      content:
-        "⚙️ Der BirthdayBot wurde auf diesem Server noch nicht eingerichtet.\nEin Administrator muss zuerst `/birthday-admin setup` ausführen.",
+      content: messageContent,
       flags: MessageFlags.Ephemeral,
     });
     return false;
