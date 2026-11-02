@@ -10,17 +10,17 @@ import {
 export function registerSubcommand(subcommand: SlashCommandSubcommandBuilder) {
   return subcommand
     .setName("add")
-    .setDescription("Öffnet ein Formular, um einen Geburtstag einzutragen.");
+    .setDescription("Open a form to register your birthday.");
 }
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const modal = new ModalBuilder()
     .setCustomId("user_add_birthday_modal")
-    .setTitle("Deinen Geburtstag eintragen");
+    .setTitle("Register Your Birthday");
 
   const dateInput = new TextInputBuilder()
     .setCustomId("date_input")
-    .setLabel("Wann hast du Geburtstag?")
+    .setLabel("When is your birthday?")
     .setPlaceholder("DD.MM")
     .setStyle(TextInputStyle.Short)
     .setMinLength(3)
@@ -29,7 +29,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   const yearInput = new TextInputBuilder()
     .setCustomId("year_input")
-    .setLabel("In welchem Jahr bist du geboren?")
+    .setLabel("What year were you born?")
     .setPlaceholder("(Optional)")
     .setStyle(TextInputStyle.Short)
     .setMaxLength(4)

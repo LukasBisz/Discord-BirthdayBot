@@ -14,7 +14,7 @@ export async function handleListInteraction(
   const guildId = interaction.guildId;
   if (!guildId) {
     return interaction.reply({
-      content: "❌ Dieser Befehl kann nur auf einem Server ausgeführt werden.",
+      content: "❌ This command can only be used in a server.",
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -26,7 +26,7 @@ export async function handleListInteraction(
 
   if (guildBirthdays.length === 0) {
     return interaction.reply({
-      content: "ℹ️ Auf diesem Server wurden noch keine Geburtstage eingetragen.",
+      content: "ℹ️ No birthdays have been registered on this server yet.",
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -66,15 +66,15 @@ export async function handleListInteraction(
       : `**${b.birthdayId}**`;
 
     const daysText =
-      b.daysUntil === 1 ? "Morgen" : `in ${b.daysUntil} Tagen`;
+      b.daysUntil === 1 ? "Tomorrow" : `in ${b.daysUntil} days`;
 
-    const ageText = b.turningAge ? ` • wird **${b.turningAge}**` : "";
+    const ageText = b.turningAge ? ` • turns **${b.turningAge}**` : "";
 
     return `**${index + 1}.** ${target} - \`${formattedDay}.${formattedMonth}.\` (${daysText})${ageText}`;
   });
 
   const embed = new EmbedBuilder()
-    .setTitle("📅 Die nächsten 5 Geburtstage")
+    .setTitle("📅 Upcoming Birthdays (Next 5)")
     .setColor(0xff6347)
     .setDescription(descriptionLines.join("\n\n"))
     .setFooter({

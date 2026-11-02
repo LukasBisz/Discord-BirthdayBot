@@ -6,7 +6,7 @@ import * as listCommand from "./subcommands/user/list";
 
 export const data = new SlashCommandBuilder()
   .setName("birthday")
-  .setDescription("Geburtstags-Befehle")
+  .setDescription("Birthday commands")
   .addSubcommand((subcommand) => addCommand.registerSubcommand(subcommand))
   .addSubcommand((subcommand) => removeCommand.registerSubcommand(subcommand))
   .addSubcommand((subcommand) => listCommand.registerSubcommand(subcommand));

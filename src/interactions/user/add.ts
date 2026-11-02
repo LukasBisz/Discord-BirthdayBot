@@ -8,7 +8,7 @@ import { announceBirthday } from "../../jobs/birthdayJob";
 export async function addInteraction(interaction: ModalSubmitInteraction) {
   if (!interaction.guildId) {
     return interaction.reply({
-      content: "❌ Dieser Befehl kann nur auf einem Server ausgeführt werden.",
+      content: "❌ This command can only be used in a server.",
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -24,7 +24,7 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
   if (!dateMatch) {
     return interaction.reply({
       content:
-        "❌ Bitte gib ein gültiges Datum im Format **TT.MM** ein (z. B. `15.04`).",
+        "❌ Please enter a valid date in the format **DD.MM** (e.g. `15.04`).",
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -41,7 +41,7 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
       parseInt(yearStr, 10) > currentYear
     ) {
       return interaction.reply({
-        content: `❌ Bitte gib ein realistisches Geburtsjahr ein (z. B. zwischen 1900 und ${currentYear}).`,
+        content: `❌ Please enter a realistic birth year (between 1900 and ${currentYear}).`,
         flags: MessageFlags.Ephemeral,
       });
     }
@@ -57,7 +57,7 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
   ) {
     return interaction.reply({
       content:
-        "❌ Diesen Tag gibt es im angegebenen Monat nicht (z. B. 31. April oder 30. Februar).",
+        "❌ This day does not exist in the specified month (e.g. April 31st or February 30th).",
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -100,7 +100,7 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
       : `${formattedDay}.${formattedMonth}.`;
 
     await interaction.reply({
-      content: `🎉 Dein Geburtstag wurde erfolgreich auf den **${dateDisplay}** gespeichert!`,
+      content: `🎉 Your birthday was successfully saved for **${dateDisplay}**!`,
       flags: MessageFlags.Ephemeral,
     });
 
@@ -111,10 +111,10 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
       await announceBirthday(interaction.client, guildId, userId, year);
     }
   } catch (error) {
-    console.error("❌ Fehler beim Speichern des Geburtstags:", error);
+    console.error("❌ Error saving birthday:", error);
     await interaction.reply({
       content:
-        "❌ Beim Speichern deines Geburtstags in der Datenbank ist ein Fehler aufgetreten.",
+        "❌ An error occurred while saving your birthday to the database.",
       flags: MessageFlags.Ephemeral,
     });
   }

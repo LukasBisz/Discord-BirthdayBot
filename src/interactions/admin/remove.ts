@@ -24,7 +24,7 @@ async function buildRemovePayload(guildId: string, page: number, client: any) {
   if (serverBirthdays.length === 0) {
     return {
       content:
-        "ℹ️ Auf diesem Server sind bisher noch keine Geburtstage eingetragen.",
+        "ℹ️ No birthdays have been registered on this server yet.",
       components: [],
     };
   }
@@ -55,7 +55,7 @@ async function buildRemovePayload(guildId: string, page: number, client: any) {
 
       return {
         label: displayName.slice(0, 100),
-        description: `Geburtstag: ${dateDisplay}`,
+        description: `Birthday: ${dateDisplay}`,
         value: String(b.id),
       };
     }),
@@ -63,7 +63,7 @@ async function buildRemovePayload(guildId: string, page: number, client: any) {
 
   const selectMenu = new StringSelectMenuBuilder()
     .setCustomId("admin_remove_birthday_select")
-    .setPlaceholder("Wähle einen Geburtstag zum Löschen aus...")
+    .setPlaceholder("Select a birthday to delete...")
     .addOptions(options);
 
   const rows: ActionRowBuilder<any>[] = [
@@ -73,19 +73,19 @@ async function buildRemovePayload(guildId: string, page: number, client: any) {
   if (totalPages > 1) {
     const prevBtn = new ButtonBuilder()
       .setCustomId(`admin_remove_page_${currentPage - 1}`)
-      .setLabel(":arrow_backward: Vorherige")
+      .setLabel("◀ Previous")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(currentPage === 0);
 
     const pageIndicator = new ButtonBuilder()
       .setCustomId("admin_remove_page_indicator")
-      .setLabel(`Seite ${currentPage + 1} / ${totalPages}`)
+      .setLabel(`Page ${currentPage + 1} / ${totalPages}`)
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(true);
 
     const nextBtn = new ButtonBuilder()
       .setCustomId(`admin_remove_page_${currentPage + 1}`)
-      .setLabel("Nächste :arrow_forward:")
+      .setLabel("Next ▶")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(currentPage >= totalPages - 1);
 
@@ -99,7 +99,7 @@ async function buildRemovePayload(guildId: string, page: number, client: any) {
   }
 
   return {
-    content: "🗑️ Welchen Geburtstag möchtest du von diesem Server entfernen?",
+    content: "🗑️ Which birthday would you like to remove from this server?",
     components: rows,
   };
 }
@@ -109,7 +109,7 @@ export async function showAdminRemoveMenu(
 ) {
   if (!interaction.guildId) {
     return interaction.reply({
-      content: "❌ Dieser Befehl kann nur auf einem Server ausgeführt werden.",
+      content: "❌ This command can only be used in a server.",
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -135,7 +135,7 @@ export async function handleAdminRemoveSelect(
   if (!target) {
     return interaction.update({
       content:
-        "❌ Dieser Eintrag konnte nicht mehr in der Datenbank gefunden werden.",
+        "❌ This entry could no longer be found in the database.",
       components: [],
     });
   }
@@ -150,13 +150,13 @@ export async function handleAdminRemoveSelect(
 
   const confirmBtn = new ButtonBuilder()
     .setCustomId(`admin_remove_confirm_${selectedId}`)
-    .setLabel("Ja, endgültig löschen")
+    .setLabel("Yes, permanently delete")
     .setStyle(ButtonStyle.Danger)
     .setEmoji("🗑️");
 
   const cancelBtn = new ButtonBuilder()
     .setCustomId("admin_remove_cancel")
-    .setLabel("Abbrechen")
+    .setLabel("Cancel")
     .setStyle(ButtonStyle.Secondary);
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -165,7 +165,7 @@ export async function handleAdminRemoveSelect(
   );
 
   await interaction.update({
-    content: `⚠️ Möchtest du den Geburtstag von **${displayName}** wirklich löschen?`,
+    content: `⚠️ Are you sure you want to delete the birthday of **${displayName}**?`,
     components: [row],
   });
 }
@@ -186,7 +186,7 @@ export async function handleAdminRemoveButton(interaction: ButtonInteraction) {
 
   if (interaction.customId === "admin_remove_cancel") {
     return interaction.update({
-      content: "❌ Vorgang abgebrochen. Der Geburtstag wurde nicht gelöscht.",
+      content: "❌ Action cancelled. The birthday was not deleted.",
       components: [],
     });
   }
@@ -201,14 +201,14 @@ export async function handleAdminRemoveButton(interaction: ButtonInteraction) {
       await db.delete(birthdays).where(eq(birthdays.id, idToDelete));
 
       return interaction.update({
-        content: "🗑️ Der Geburtstag wurde erfolgreich gelöscht.",
+        content: "🗑️ The birthday has been deleted successfully.",
         components: [],
       });
     } catch (error) {
-      console.error("❌ Fehler beim Löschen des Geburtstags:", error);
+      console.error("❌ Error deleting birthday:", error);
 
       return interaction.update({
-        content: "❌ Beim Löschen des Geburtstags ist ein Fehler aufgetreten.",
+        content: "❌ An error occurred while deleting the birthday.",
         components: [],
       });
     }

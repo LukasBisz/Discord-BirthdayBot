@@ -11,21 +11,21 @@ import {
 export function registerSubcommand(subcommand: SlashCommandSubcommandBuilder) {
   return subcommand
     .setName("setup")
-    .setDescription("Wähle den Zielkanal für die Geburtstagsglückwünsche aus.");
+    .setDescription("Select the channel for birthday announcements.");
 }
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
     return interaction.reply({
       content:
-        "❌ Du benötigst Administrator-Rechte, um das Setup auszuführen.",
+        "❌ You need Administrator permissions to run the setup.",
       flags: MessageFlags.Ephemeral,
     });
   }
 
   const channelSelector = new ChannelSelectMenuBuilder()
     .setCustomId("setup_channel_selector")
-    .setPlaceholder("Wähle einen Textkanal aus...")
+    .setPlaceholder("Select a text channel...")
     .setChannelTypes([ChannelType.GuildText])
     .setMinValues(1)
     .setMaxValues(1);
@@ -36,7 +36,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   await interaction.reply({
     content:
-      "📌 Bitte wähle über das Dropdown-Menü aus, in welchen Kanal die Geburtstage gepostet werden sollen:",
+      "📌 Please use the dropdown menu to select the channel where birthday announcements should be posted:",
     components: [row],
     flags: MessageFlags.Ephemeral,
   });

@@ -12,7 +12,7 @@ export async function isServerSetup(
 ): Promise<boolean> {
   if (!interaction.guildId) {
     await interaction.reply({
-      content: "❌ Dieser Befehl kann nur auf einem Server ausgeführt werden.",
+      content: "❌ This command can only be used in a server.",
       flags: MessageFlags.Ephemeral,
     });
     return false;
@@ -29,8 +29,8 @@ export async function isServerSetup(
       false;
 
     const messageContent = isAdmin
-      ? "⚙️ Der BirthdayBot wurde auf diesem Server noch nicht eingerichtet.\nBitte führe zuerst `/birthday-admin setup` aus, um den Zielkanal festzulegen."
-      : "⚙️ Der BirthdayBot wurde auf diesem Server noch nicht eingerichtet.\nBitte wende dich an einen Administrator, um die Einrichtung abzuschließen.";
+      ? "⚙️ BirthdayBot has not been set up on this server yet.\nPlease run `/birthday-admin setup` first to configure the announcement channel."
+      : "⚙️ BirthdayBot has not been set up on this server yet.\nPlease contact an Administrator to complete the setup.";
 
     await interaction.reply({
       content: messageContent,

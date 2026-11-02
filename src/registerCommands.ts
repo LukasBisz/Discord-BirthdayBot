@@ -18,39 +18,40 @@ export async function registerCommandsForGuild(
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
       body: commands,
     });
-    console.log(`✅ Befehle für Server (${guildId}) erfolgreich registriert.`);
+    console.log(`✅ Commands registered successfully for guild (${guildId}).`);
   } catch (error) {
-    console.error(`❌ Fehler beim Registrieren für Server (${guildId}:`, error);
+    console.error(`❌ Error registering commands for guild (${guildId}):`, error);
   }
 }
 
 export async function registerCommands(client: Client) {
   const clientId = client.user?.id;
   if (!clientId) {
-    console.error("❌ Client-ID konnte nicht ermittelt werden!");
+    console.error("❌ Failed to resolve client ID!");
     return;
   }
 
   try {
     // Register commands for servers separately
-    console.log("📡 Hole alle Server für gildenspezifische Registrierung...");
+    console.log("📡 Fetching all guilds for guild-specific registration...");
     const guilds = await client.guilds.fetch();
 
-    console.log(`🔄 Registriere Befehle für ${guilds.size} Server...`);
+    console.log(`🔄 Registering commands for ${guilds.size} guild(s)...`);
     for (const [guildId, oauthGuild] of guilds) {
       await registerCommandsForGuild(guildId, clientId);
     }
-    console.log("✅ Alle Server-Befehle erfolgreich registriert!");
+    console.log("✅ All guild commands registered successfully!");
 
     // Register commands for servers globally (can take up to 1 hour to update)
     /*
-    console.log("🔄 Registriere Befehle GLOBAL...");
-    await res.put(Routes.applicationCommands(clientId), {
+    console.log("🔄 Registering commands globally...");
+    await rest.put(Routes.applicationCommands(clientId), {
       body: commands,
     });
-    console.log("✅ Globale Befehle erfolgreich registriert!")
+    console.log("✅ Global commands registered successfully!");
     */
+   
   } catch (error) {
-    console.error("❌ Fehler bei der Befehlsregistrierung:", error);
+    console.error("❌ Error registering commands:", error);
   }
 }

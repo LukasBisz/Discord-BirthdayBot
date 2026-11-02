@@ -8,7 +8,7 @@ export async function removeInteraction(interaction: ButtonInteraction) {
 
   if (interaction.customId === "user_remove_birthday_cancel") {
     return interaction.update({
-      content: "❌ Vorgang abgebrochen. Dein Geburtstag bleibt unverändert.",
+      content: "❌ Action cancelled. Your birthday remains unchanged.",
       components: [],
     });
   }
@@ -22,7 +22,7 @@ export async function removeInteraction(interaction: ButtonInteraction) {
 
       if (!existingBirthday) {
         return interaction.update({
-          content: "ℹ️ Du hattest bisher gar keinen Geburtstag eingetragen.",
+          content: "ℹ️ You did not have a birthday registered.",
           components: [],
         });
       }
@@ -30,14 +30,14 @@ export async function removeInteraction(interaction: ButtonInteraction) {
       await db.delete(birthdays).where(eq(birthdays.birthdayId, userId));
 
       return interaction.update({
-        content: "🗑️ Dein Geburtstag wurde erfolgreich gelöscht.",
+        content: "🗑️ Your birthday has been deleted successfully.",
         components: [],
       });
     } catch (error) {
-      console.error("❌ Fehler beim Löschen des Geburtstags:", error);
+      console.error("❌ Error deleting birthday:", error);
       return interaction.update({
         content:
-          "❌ Beim Löschen deines Geburtstags ist ein Fehler aufgetreten.",
+          "❌ An error occurred while deleting your birthday.",
         components: [],
       });
     }

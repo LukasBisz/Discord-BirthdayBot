@@ -10,7 +10,7 @@ import * as addCommand from "./subcommands/admin/add";
 
 export const data = new SlashCommandBuilder()
   .setName("birthday-admin")
-  .setDescription("Verwalte und konfiguriere den BirthdayBot.")
+  .setDescription("Manage and configure BirthdayBot.")
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
   .addSubcommand((subcommand) => setupCommand.registerSubcommand(subcommand))
   .addSubcommand((subcommand) => removeCommand.registerSubcommand(subcommand))

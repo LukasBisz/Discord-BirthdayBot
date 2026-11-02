@@ -30,7 +30,7 @@ export async function announceBirthday(
       .limit(1);
 
     if (record?.lastDisplayedAt === todayString) {
-      console.log(`⏭️ Already sent for ${birthdayUserId} today, skipping.`);
+      console.log(`⏭️ Already sent for user (${birthdayUserId}) today, skipping.`);
       return false;
     }
 
@@ -46,7 +46,7 @@ export async function announceBirthday(
       .limit(1);
 
     if (!config || !config.channelId) {
-      console.log(`⚠️ No setup for guild ${guildId}, skipping.`);
+      console.log(`⚠️ No setup found for guild (${guildId}), skipping.`);
       return false;
     }
 
@@ -54,13 +54,13 @@ export async function announceBirthday(
       .fetch(config.channelId)
       .catch(() => null);
     if (!channel || !(channel instanceof TextChannel)) {
-      console.log(`⚠️ Channel ${config.channelId} not accessible.`);
+      console.log(`⚠️ Channel (${config.channelId}) not accessible.`);
       return false;
     }
 
     const user = await client.users.fetch(birthdayUserId).catch(() => null);
     if (!user || !client.user) {
-      console.warn(`⚠️ Could not fetch user ${birthdayUserId}.`);
+      console.warn(`⚠️ Could not fetch user (${birthdayUserId}).`);
       return false;
     }
 
@@ -104,12 +104,12 @@ export async function announceBirthday(
       );
 
     console.log(
-      `✅ Sent birthday embed for: ${user.username}(${user.id}) in guild: ${channel.guild.name}(${guildId})`,
+      `✅ Sent birthday embed for: ${user.username} (${user.id}) in guild: ${channel.guild.name} (${guildId})`,
     );
     return true;
   } catch (error) {
     console.error(
-      `❌ Failed to announce birthday for ${birthdayUserId}:`,
+      `❌ Failed to announce birthday for user (${birthdayUserId}):`,
       error,
     );
     return false;

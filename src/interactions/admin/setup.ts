@@ -11,7 +11,7 @@ export async function setupInteraction(
 ) {
   if (!interaction.guildId) {
     return interaction.reply({
-      content: "❌ Diese Aktion kann nur auf einem Server ausgeführt werden.",
+      content: "❌ This action can only be used in a server.",
       ephemeral: true,
     });
   }
@@ -42,14 +42,14 @@ export async function setupInteraction(
     }
 
     await interaction.update({
-      content: `✅ Der Geburtstagskanal wurde erfolgreich auf <#${selectedChannelId}> festgelegt!`,
+      content: `✅ The birthday announcement channel has been set to <#${selectedChannelId}>!`,
       components: [],
     });
   } catch (error) {
-    console.error("❌ Fehler beim Speichern des Geburtstagskanals:", error);
+    console.error("❌ Error saving birthday channel:", error);
     await interaction.reply({
       content:
-        "❌ Beim Speichern der Kanaleinstellungen ist ein Fehler aufgetreten.",
+        "❌ An error occurred while saving the channel settings.",
       ephemeral: true,
     });
   }

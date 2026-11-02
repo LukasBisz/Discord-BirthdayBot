@@ -10,25 +10,25 @@ export function registerSubcommand(subcommand: SlashCommandSubcommandBuilder) {
   return subcommand
     .setName("add")
     .setDescription(
-      "Trage einen Geburtstag für ein Mitglied oder externe Person ein.",
+      "Register a birthday for a member or external person.",
     );
 }
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const modal = new ModalBuilder()
     .setCustomId("admin_add_birthday_modal")
-    .setTitle("Geburtstag eintragen (Admin)");
+    .setTitle("Register Birthday (Admin)");
 
   const targetInput = new TextInputBuilder()
     .setCustomId("target_input")
-    .setLabel("Discord-ID oder Name der Person")
-    .setPlaceholder("z. B. 1561394751264137227 oder Freund")
+    .setLabel("Discord ID or name of the person")
+    .setPlaceholder("e.g. 1561394751264137227 or Friend")
     .setStyle(TextInputStyle.Short)
     .setRequired(true);
 
   const dateInput = new TextInputBuilder()
     .setCustomId("date_input")
-    .setLabel("Geburtstag")
+    .setLabel("Birthday")
     .setPlaceholder("DD.MM")
     .setStyle(TextInputStyle.Short)
     .setMinLength(3)
@@ -37,7 +37,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   const yearInput = new TextInputBuilder()
     .setCustomId("year_input")
-    .setLabel("Geburtsjahr")
+    .setLabel("Birth year")
     .setPlaceholder("Optional")
     .setStyle(TextInputStyle.Short)
     .setMaxLength(4)

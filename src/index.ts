@@ -31,7 +31,7 @@ client.on("clientReady", async (c) => {
 });
 
 client.on("guildCreate", async (guild) => {
-  console.log(`🚀 Neuem Server beigetreten: "${guild.name}" (${guild.id})`);
+  console.log(`🚀 Joined new guild: "${guild.name}" (${guild.id})`);
   if (client.user) {
     await registerCommandsForGuild(guild.id, client.user.id);
   }
@@ -39,8 +39,8 @@ client.on("guildCreate", async (guild) => {
 });
 
 client.on("guildDelete", async (guild) => {
-  const guildName = guild.name ?? "Unbekannter Server";
-  console.log(`📤 Bot wurde von Server entfernt: "${guildName}" (${guild.id})`);
+  const guildName = guild.name ?? "Unknown Guild";
+  console.log(`📤 Bot was removed from guild: "${guildName}" (${guild.id})`);
   await cleanupGuild(guild.id);
 });
 

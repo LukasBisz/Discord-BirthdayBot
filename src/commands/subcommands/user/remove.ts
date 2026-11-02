@@ -9,19 +9,19 @@ import {
 export function registerSubcommand(subcommand: SlashCommandSubcommandBuilder) {
   return subcommand
     .setName("remove")
-    .setDescription("Lösche deinen eingetragenen Geburtstag.");
+    .setDescription("Delete your registered birthday.");
 }
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const confirmButton = new ButtonBuilder()
     .setCustomId("user_remove_birthday_confirm")
-    .setLabel("Ja, löschen")
+    .setLabel("Yes, delete")
     .setStyle(ButtonStyle.Danger)
     .setEmoji("🗑️");
 
   const cancelButton = new ButtonBuilder()
     .setCustomId("user_remove_birthday_cancel")
-    .setLabel("Abbrechen")
+    .setLabel("Cancel")
     .setStyle(ButtonStyle.Secondary);
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -31,7 +31,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   await interaction.reply({
     content:
-      "⚠️ Möchtest du deinen eingetragenen Geburtstag wirklich aus der Datenbank entfernen?",
+      "⚠️ Are you sure you want to remove your registered birthday from the database?",
     components: [row],
     flags: MessageFlags.Ephemeral,
   });

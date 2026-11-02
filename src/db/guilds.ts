@@ -15,11 +15,11 @@ export async function initGuild(guildId: string): Promise<void> {
         guildId,
         setupComplete: false,
       });
-      console.log(`📝 Konfiguration für Server (${guildId}) initial angelegt.`);
+      console.log(`📝 Initialized configuration for guild (${guildId}).`);
     }
   } catch (error) {
     console.error(
-      `❌ Fehler beim Anlegen der Konfiguration für (${guildId}):`,
+      `❌ Error creating configuration for guild (${guildId}):`,
       error,
     );
   }
@@ -32,11 +32,11 @@ export async function syncGuild(client: Client): Promise<void> {
       await initGuild(guildId);
     }
     console.log(
-      `✅ Alle Server-Konfigurationen synchronisiert (${guilds.size} Server).`,
+      `✅ All guild configurations synchronized successfully (${guilds.size} guild(s)).`,
     );
   } catch (error) {
     console.error(
-      "❌ Fehler beim Synchronisieren der Server-Konfigurationen:",
+      "❌ Error synchronizing guild configurations:",
       error,
     );
   }
@@ -47,11 +47,11 @@ export async function cleanupGuild(guildId: string): Promise<void> {
     await db.delete(configuration).where(eq(configuration.guildId, guildId));
     await db.delete(birthdays).where(eq(birthdays.guildId, guildId));
     console.log(
-      `🧹 Daten für Server (${guildId}) wurden vollständig bereinigt.`,
+      `🧹 Data for guild (${guildId}) was cleaned up successfully.`,
     );
   } catch (error) {
     console.error(
-      `❌ Fehler beim Bereinigen der Daten für Server (${guildId}):`,
+      `❌ Error cleaning up data for guild (${guildId}):`,
       error,
     );
   }
