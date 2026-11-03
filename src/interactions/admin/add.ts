@@ -8,6 +8,9 @@ import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { eq, and } from "drizzle-orm";
 import { announceBirthday } from "../../jobs/birthdayJob";
+import { DateTime } from "luxon";
+
+const TIMEZONE = "Europe/Berlin";
 
 export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
   if (!interaction.guildId) {
@@ -40,7 +43,7 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
 
   let year: number | null = null;
   if (yearStr !== "") {
-    const currentYear = new Date().getFullYear();
+    const currentYear = DateTime.now().year;
     if (
       !BIRTHDAY_YEAR_REGEX.test(yearStr) ||
       parseInt(yearStr, 10) > currentYear
@@ -54,11 +57,7 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
   }
 
   const testYear = year ?? 2024;
-  const calenderCheck = new Date(testYear, month - 1, day);
-  if (
-    calenderCheck.getMonth() !== month - 1 ||
-    calenderCheck.getDate() !== day
-  ) {
+  if (!DateTime.fromObject({ year: testYear, month, day }).isValid) {
     return interaction.reply({
       content:
         "❌ This day does not exist in the specified month (e.g. April 31st or February 30th).",
@@ -117,8 +116,8 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
       flags: MessageFlags.Ephemeral,
     });
 
-    const now = new Date();
-    const isToday = day === now.getDate() && month === now.getMonth() + 1;
+    const now = DateTime.now().setZone(TIMEZONE);
+    const isToday = day === now.day && month === now.month;
     if (isToday) {
       await announceBirthday(interaction.client, guildId, targetInput, year);
     }

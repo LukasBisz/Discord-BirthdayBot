@@ -7,6 +7,9 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { DISCORD_ID_REGEX } from "../../utils/regex";
+import { DateTime } from "luxon";
+
+const TIMEZONE = "Europe/Berlin";
 
 export async function handleListInteraction(
   interaction: ChatInputCommandInteraction,
@@ -31,20 +34,21 @@ export async function handleListInteraction(
     });
   }
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const todayStart = new Date(currentYear, now.getMonth(), now.getDate());
+  const today = DateTime.now().setZone(TIMEZONE).startOf("day");
+  const currentYear = today.year;
 
   const upcomingList = guildBirthdays.map((b) => {
-    let nextDate = new Date(currentYear, b.month - 1, b.day);
+    let nextDate = DateTime.fromObject(
+      { year: currentYear, month: b.month, day: b.day },
+      { zone: TIMEZONE },
+    ).startOf("day");
 
-    if (nextDate.getTime() <= todayStart.getTime()) {
-      nextDate = new Date(currentYear + 1, b.month - 1, b.day);
+    if (nextDate <= today) {
+      nextDate = nextDate.plus({ years: 1 });
     }
 
-    const diffMs = nextDate.getTime() - todayStart.getTime();
-    const daysUntil = Math.round(diffMs / (1000 * 60 * 60 * 24));
-    const turningAge = b.year ? nextDate.getFullYear() - b.year : null;
+    const daysUntil = Math.round(nextDate.diff(today, "days").days);
+    const turningAge = b.year ? nextDate.year - b.year : null;
 
     return {
       ...b,

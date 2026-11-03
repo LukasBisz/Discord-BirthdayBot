@@ -3,9 +3,12 @@ import { Client, TextChannel, EmbedBuilder } from "discord.js";
 import { db } from "../db/connection";
 import { birthdays, configuration } from "../db/schema";
 import { eq, and } from "drizzle-orm";
+import { DateTime } from "luxon";
 
-export function toDateString(date: Date): string {
-  return date.toISOString().slice(0, 10);
+const TIMEZONE = "Europe/Berlin";
+
+export function toDateString(dt: DateTime): string {
+  return dt.toISODate()!;
 }
 
 export async function announceBirthday(
@@ -14,7 +17,7 @@ export async function announceBirthday(
   birthdayUserId: string,
   year: number | null,
 ): Promise<boolean> {
-  const now = new Date();
+  const now = DateTime.now().setZone(TIMEZONE);
   const todayString = toDateString(now);
 
   try {
@@ -64,7 +67,7 @@ export async function announceBirthday(
       return false;
     }
 
-    const age = year != null ? now.getFullYear() - year : null;
+    const age = year != null ? now.year - year : null;
 
     const description =
       age !== null
@@ -122,8 +125,8 @@ export function startBirthdayJob(client: Client): void {
     async () => {
       console.log("🎂 Running birthday check...");
 
-      const now = new Date();
-      const today = { day: now.getDate(), month: now.getMonth() + 1 };
+      const now = DateTime.now().setZone(TIMEZONE);
+      const today = { day: now.day, month: now.month };
 
       try {
         const todaysBirthdays = await db
