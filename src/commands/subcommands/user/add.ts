@@ -1,11 +1,14 @@
 import {
-  ActionRowBuilder,
   ChatInputCommandInteraction,
+  LabelBuilder,
   ModalBuilder,
   SlashCommandSubcommandBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { TIMEZONE_OPTIONS } from "../../../constants/timezones";
 
 export function registerSubcommand(subcommand: SlashCommandSubcommandBuilder) {
   return subcommand
@@ -20,7 +23,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   const dateInput = new TextInputBuilder()
     .setCustomId("date_input")
-    .setLabel("When is your birthday?")
     .setPlaceholder("DD.MM")
     .setStyle(TextInputStyle.Short)
     .setMinLength(3)
@@ -29,21 +31,38 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   const yearInput = new TextInputBuilder()
     .setCustomId("year_input")
-    .setLabel("What year were you born?")
     .setPlaceholder("(Optional)")
     .setStyle(TextInputStyle.Short)
     .setMaxLength(4)
     .setRequired(false);
 
-  const firstRow = new ActionRowBuilder<TextInputBuilder>().addComponents(
-    dateInput,
-  );
+  const selectTimeZone = new StringSelectMenuBuilder()
+    .setCustomId("select_time_zone")
+    .setPlaceholder("Select your time zone")
+    .setRequired(true)
+    .addOptions(
+      TIMEZONE_OPTIONS.map((tz) =>
+        new StringSelectMenuOptionBuilder()
+          .setLabel(tz.label)
+          .setDescription(tz.description)
+          .setValue(tz.value)
+          .setEmoji(tz.emoji),
+      ),
+    );
 
-  const secondRow = new ActionRowBuilder<TextInputBuilder>().addComponents(
-    yearInput,
-  );
+  const dateLabel = new LabelBuilder()
+    .setLabel("When is your birthday?")
+    .setTextInputComponent(dateInput);
 
-  modal.addComponents(firstRow, secondRow);
+  const yearLabel = new LabelBuilder()
+    .setLabel("What year were you born?")
+    .setTextInputComponent(yearInput);
+
+  const timezoneLabel = new LabelBuilder()
+    .setLabel("Select your time zone.")
+    .setStringSelectMenuComponent(selectTimeZone);
+
+  modal.addLabelComponents(dateLabel, yearLabel, timezoneLabel);
 
   await interaction.showModal(modal);
 }

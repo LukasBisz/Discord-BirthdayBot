@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "370bcc78-59f1-4006-a7bd-d7ca00c8ac9b",
+  "id": "b839c811-7242-431c-962e-63eb125aace2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "birthdays": {
@@ -56,6 +56,14 @@
           "notNull": false,
           "autoincrement": false
         },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'UTC'"
+        },
         "last_displayed_at": {
           "name": "last_displayed_at",
           "type": "text",
@@ -91,7 +99,7 @@
           "name": "channel_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "setup_complete": {
@@ -101,14 +109,6 @@
           "notNull": true,
           "autoincrement": false,
           "default": false
-        },
-        "trusted_users": {
-          "name": "trusted_users",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
         }
       },
       "indexes": {},

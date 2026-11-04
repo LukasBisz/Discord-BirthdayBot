@@ -18,6 +18,7 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
 
   const dateStr = interaction.fields.getTextInputValue("date_input").trim();
   const yearStr = interaction.fields.getTextInputValue("year_input").trim();
+  const timezone = interaction.fields.getStringSelectValues("select_time_zone")[0]
 
   const userId = interaction.user.id;
   const guildId = interaction.guildId;
@@ -75,6 +76,7 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
           day,
           month,
           year,
+          timezone,
           addedBy: userId,
         })
         .where(
@@ -88,6 +90,7 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
         day,
         month,
         year,
+        timezone,
       });
     }
 

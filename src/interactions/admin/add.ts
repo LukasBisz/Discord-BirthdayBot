@@ -15,7 +15,7 @@ const TIMEZONE = "Europe/Berlin";
 export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
   if (!interaction.guildId) {
     return interaction.reply({
-      content: "",
+      content: "❌ This command can only be used in a server.",
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -25,6 +25,8 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
     .trim();
   const dateStr = interaction.fields.getTextInputValue("date_input").trim();
   const yearStr = interaction.fields.getTextInputValue("year_input").trim();
+  const timezone =
+    interaction.fields.getStringSelectValues("select_time_zone")[0];
 
   const guildId = interaction.guildId;
   const addedBy = interaction.user.id;
@@ -87,7 +89,7 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
     if (existingBirthday) {
       await db
         .update(birthdays)
-        .set({ day, month, year, addedBy })
+        .set({ day, month, year, timezone, addedBy })
         .where(
           and(
             eq(birthdays.guildId, guildId),
@@ -102,6 +104,7 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
         day,
         month,
         year,
+        timezone,
       });
     }
 

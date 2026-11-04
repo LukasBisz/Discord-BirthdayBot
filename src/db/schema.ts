@@ -8,6 +8,7 @@ export const birthdays = sqliteTable("birthdays", {
   day: integer("day").notNull(),
   month: integer("month").notNull(),
   year: integer("year"),
+  timezone: text("timezone").notNull().default("UTC"),
   lastDisplayedAt: text("last_displayed_at"),
 });
 
