@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { isServerSetup } from "../utils/checkSetup";
+import { isServerSetup } from "../interactions/admin/setup";
 import * as addCommand from "./subcommands/user/add";
 import * as removeCommand from "./subcommands/user/remove";
 import * as listCommand from "./subcommands/user/list";
