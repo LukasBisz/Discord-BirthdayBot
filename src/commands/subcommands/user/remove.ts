@@ -1,10 +1,11 @@
-import { ActionRowBuilder, ButtonBuilder } from "discord.js";
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
   ButtonStyle,
   ChatInputCommandInteraction,
-  MessageFlags,
   SlashCommandSubcommandBuilder,
 } from "discord.js";
+import { handleRemoveCommand } from "../../../interactions/user/remove";
 
 export function registerSubcommand(subcommand: SlashCommandSubcommandBuilder) {
   return subcommand
@@ -29,10 +30,5 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     cancelButton,
   );
 
-  await interaction.reply({
-    content:
-      "⚠️ Are you sure you want to remove your registered birthday from the database?",
-    components: [row],
-    flags: MessageFlags.Ephemeral,
-  });
+  await handleRemoveCommand(interaction, [row]);
 }
