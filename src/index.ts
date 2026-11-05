@@ -1,8 +1,13 @@
-import { Client, GatewayIntentBits, GuildWidgetStyle } from "discord.js";
+import { Client, GatewayIntentBits } from "discord.js";
 import { config } from "./config";
 import { connectToDatabase } from "./db/connection";
 import { registerCommands, registerCommandsForGuild } from "./registerCommands";
-import { initGuild, syncGuild, cleanupGuild } from "./db/guilds";
+import {
+  initGuild,
+  syncGuild,
+  cleanupGuild,
+  cleanupMemberBirthday,
+} from "./db/guilds";
 import { execute as executeBirthdayCommand } from "./commands/birthday";
 import { execute as executeBirthdayAdminCommand } from "./commands/birthday-admin";
 import { setupInteraction } from "./interactions/admin/setup";
@@ -15,7 +20,9 @@ import {
 import { handleAdminAddModal } from "./interactions/admin/add";
 import { startBirthdayJob } from "./jobs/birthdayJob";
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+});
 
 client.on("clientReady", async (c) => {
   console.log("────────────────────────────────────────");
@@ -42,6 +49,12 @@ client.on("guildDelete", async (guild) => {
   const guildName = guild.name ?? "Unknown Guild";
   console.log(`📤 Bot was removed from guild: "${guildName}" (${guild.id})`);
   await cleanupGuild(guild.id);
+});
+
+client.on("guildMemberRemove", async (member) => {
+  const guildName = member.guild.name ?? "Unknown Guild";
+  const username = member.user?.username ?? member.displayName;
+  await cleanupMemberBirthday(member.guild.id, member.id, username, guildName);
 });
 
 client.on("interactionCreate", async (interaction) => {
