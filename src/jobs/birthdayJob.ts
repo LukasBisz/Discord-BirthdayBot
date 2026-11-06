@@ -9,6 +9,21 @@ export function toDateString(dt: DateTime): string {
   return dt.toISODate()!;
 }
 
+export function isBirthdayToday(
+  birthdayDay: number,
+  birthdayMonth: number,
+  nowInTz: DateTime,
+): boolean {
+  if (birthdayDay === 29 && birthdayMonth === 2) {
+    if (nowInTz.isInLeapYear) {
+      return nowInTz.day === 29 && nowInTz.month === 2;
+    }
+    return nowInTz.day === 1 && nowInTz.month === 3;
+  }
+
+  return nowInTz.day === birthdayDay && nowInTz.month === birthdayMonth;
+}
+
 export async function announceBirthday(
   client: Client,
   guildId: string,
@@ -122,7 +137,7 @@ export async function announceBirthday(
 }
 
 export async function checkBirthdays(client: Client): Promise<void> {
-  console.log("🎂 Running hourly timezone-based birthday check...");
+  console.log("⏰ Running hourly timezone-based birthday check...");
 
   try {
     const allBirthdays = await db.select().from(birthdays);
@@ -135,7 +150,7 @@ export async function checkBirthdays(client: Client): Promise<void> {
         continue;
       }
 
-      if (nowInTz.day !== record.day || nowInTz.month !== record.month) {
+      if (!isBirthdayToday(record.day, record.month, nowInTz)) {
         continue;
       }
 

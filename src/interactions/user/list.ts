@@ -38,13 +38,33 @@ export async function handleListInteraction(
   const currentYear = today.year;
 
   const upcomingList = guildBirthdays.map((b) => {
+    const isFeb29 = b.day === 29 && b.month === 2;
+    const isLeapThisYear = DateTime.fromObject(
+      { year: currentYear },
+      { zone: TIMEZONE },
+    ).isInLeapYear;
+
+    const targetMonth = isFeb29 && !isLeapThisYear ? 3 : b.month;
+    const targetDay = isFeb29 && !isLeapThisYear ? 1 : b.day;
+
     let nextDate = DateTime.fromObject(
-      { year: currentYear, month: b.month, day: b.day },
+      { year: currentYear, month: targetMonth, day: targetDay },
       { zone: TIMEZONE },
     ).startOf("day");
 
     if (nextDate <= today) {
-      nextDate = nextDate.plus({ years: 1 });
+      const nextYear = currentYear + 1;
+      const isLeapNextYear = DateTime.fromObject(
+        { year: nextYear },
+        { zone: TIMEZONE },
+      ).isInLeapYear;
+      const nextMonth = isFeb29 && !isLeapNextYear ? 3 : b.month;
+      const nextDay = isFeb29 && !isLeapNextYear ? 1 : b.day;
+
+      nextDate = DateTime.fromObject(
+        { year: nextYear, month: nextMonth, day: nextDay },
+        { zone: TIMEZONE },
+      ).startOf("day");
     }
 
     const daysUntil = Math.round(nextDate.diff(today, "days").days);

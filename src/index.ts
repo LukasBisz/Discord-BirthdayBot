@@ -25,16 +25,16 @@ const client = new Client({
 });
 
 client.on("clientReady", async (c) => {
-  console.log("────────────────────────────────────────");
+  console.log("──────────────────────────────────────────────────────────");
   await connectToDatabase();
-  console.log("────────────────────────────────────────");
+  console.log("──────────────────────────────────────────────────────────");
   await registerCommands(client);
-  console.log("────────────────────────────────────────");
+  console.log("──────────────────────────────────────────────────────────");
   await syncGuild(client);
-  console.log("────────────────────────────────────────");
+  console.log("──────────────────────────────────────────────────────────");
   startBirthdayJob(client);
   console.log(`✅ ${c.user.username} is online! 🤖`);
-  console.log("────────────────────────────────────────");
+  console.log("──────────────────────────────────────────────────────────");
 });
 
 client.on("guildCreate", async (guild) => {
@@ -47,7 +47,7 @@ client.on("guildCreate", async (guild) => {
 
 client.on("guildDelete", async (guild) => {
   const guildName = guild.name ?? "Unknown Guild";
-  console.log(`📤 Bot was removed from guild: "${guildName}" (${guild.id})`);
+  console.log(`🤖 Bot was removed from guild: "${guildName}" (${guild.id})`);
   await cleanupGuild(guild.id);
 });
 

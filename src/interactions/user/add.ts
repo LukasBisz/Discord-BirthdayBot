@@ -3,7 +3,11 @@ import { eq, and } from "drizzle-orm";
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { BIRTHDAY_DATE_REGEX, BIRTHDAY_YEAR_REGEX } from "../../utils/regex";
-import { announceBirthday, toDateString } from "../../jobs/birthdayJob";
+import {
+  announceBirthday,
+  isBirthdayToday,
+  toDateString,
+} from "../../jobs/birthdayJob";
 import { DateTime } from "luxon";
 
 export async function addInteraction(interaction: ModalSubmitInteraction) {
@@ -106,7 +110,7 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
 
     const userTz = timezone || "UTC";
     const nowInTz = DateTime.now().setZone(userTz);
-    const isToday = day === nowInTz.day && month === nowInTz.month;
+    const isToday = isBirthdayToday(day, month, nowInTz);
 
     if (isToday) {
       const todayString = toDateString(nowInTz);

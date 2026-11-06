@@ -7,7 +7,11 @@ import {
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { eq, and } from "drizzle-orm";
-import { announceBirthday, toDateString } from "../../jobs/birthdayJob";
+import {
+  announceBirthday,
+  isBirthdayToday,
+  toDateString,
+} from "../../jobs/birthdayJob";
 import { DateTime } from "luxon";
 
 export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
@@ -119,7 +123,7 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
 
     const userTz = timezone || "UTC";
     const nowInTz = DateTime.now().setZone(userTz);
-    const isToday = day === nowInTz.day && month === nowInTz.month;
+    const isToday = isBirthdayToday(day, month, nowInTz);
 
     if (isToday) {
       const todayString = toDateString(nowInTz);
