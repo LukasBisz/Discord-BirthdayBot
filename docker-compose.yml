@@ -1,9 +1,9 @@
 services:
   birthday-bot:
     build: .
-    contrainer_name: discord-birthdaybot
+    container_name: discord-birthdaybot
     restart: unless-stopped
     env_file:
       - .env
-    volumes: 
+    volumes:
       - ./data:/app/data
