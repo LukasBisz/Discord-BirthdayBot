@@ -1,25 +1,26 @@
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
+
+RUN apk add --no-cache python3 make g++
 
 COPY package*.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run buil
+RUN npm run build --if-present
 
-FROM node:20-alpine AS runner
+
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
 COPY package*.json ./
-RUN npm ci --only=production
 
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/drizzle ./drizzle
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/package.json ./package.json
 
-RUN mkdir -p /app/data
-
-CMD ["node", "dist/index.js"]
+CMD ["npm", "start"]
