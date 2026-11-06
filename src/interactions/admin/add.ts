@@ -7,10 +7,8 @@ import {
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { eq, and } from "drizzle-orm";
-import { announceBirthday } from "../../jobs/birthdayJob";
+import { announceBirthday, toDateString } from "../../jobs/birthdayJob";
 import { DateTime } from "luxon";
-
-const TIMEZONE = "Europe/Berlin";
 
 export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
   if (!interaction.guildId) {
@@ -119,10 +117,21 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
       flags: MessageFlags.Ephemeral,
     });
 
-    const now = DateTime.now().setZone(TIMEZONE);
-    const isToday = day === now.day && month === now.month;
+    const userTz = timezone || "UTC";
+    const nowInTz = DateTime.now().setZone(userTz);
+    const isToday = day === nowInTz.day && month === nowInTz.month;
+
     if (isToday) {
-      await announceBirthday(interaction.client, guildId, targetInput, year);
+      const todayString = toDateString(nowInTz);
+      if (existingBirthday?.lastDisplayedAt !== todayString) {
+        await announceBirthday(
+          interaction.client,
+          guildId,
+          targetInput,
+          year,
+          userTz,
+        );
+      }
     }
   } catch (error) {
     console.error("❌ Error saving birthday:", error);

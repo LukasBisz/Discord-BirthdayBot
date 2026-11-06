@@ -5,8 +5,6 @@ import { birthdays, configuration } from "../db/schema";
 import { eq, and } from "drizzle-orm";
 import { DateTime } from "luxon";
 
-const TIMEZONE = "Europe/Berlin";
-
 export function toDateString(dt: DateTime): string {
   return dt.toISODate()!;
 }
@@ -16,10 +14,8 @@ export async function announceBirthday(
   guildId: string,
   birthdayUserId: string,
   year: number | null,
+  timezone?: string,
 ): Promise<boolean> {
-  const now = DateTime.now().setZone(TIMEZONE);
-  const todayString = toDateString(now);
-
   try {
     const [record] = await db
       .select()
@@ -32,8 +28,14 @@ export async function announceBirthday(
       )
       .limit(1);
 
+    const userTz = timezone ?? record?.timezone ?? "UTC";
+    const now = DateTime.now().setZone(userTz);
+    const todayString = toDateString(now);
+
     if (record?.lastDisplayedAt === todayString) {
-      console.log(`⏭️ Already sent for user (${birthdayUserId}) today, skipping.`);
+      console.log(
+        `⏭️ Already sent for user (${birthdayUserId}) today, skipping.`,
+      );
       return false;
     }
 
@@ -119,39 +121,52 @@ export async function announceBirthday(
   }
 }
 
+export async function checkBirthdays(client: Client): Promise<void> {
+  console.log("🎂 Running hourly timezone-based birthday check...");
+
+  try {
+    const allBirthdays = await db.select().from(birthdays);
+
+    for (const record of allBirthdays) {
+      const userTz = record.timezone || "UTC";
+      const nowInTz = DateTime.now().setZone(userTz);
+
+      if (nowInTz.hour !== 0) {
+        continue;
+      }
+
+      if (nowInTz.day !== record.day || nowInTz.month !== record.month) {
+        continue;
+      }
+
+      const todayString = toDateString(nowInTz);
+      if (record.lastDisplayedAt === todayString) {
+        continue;
+      }
+
+      await announceBirthday(
+        client,
+        record.guildId,
+        record.birthdayId,
+        record.year,
+        userTz,
+      );
+    }
+  } catch (error) {
+    console.error("❌ Hourly birthday job failed:", error);
+  }
+}
+
 export function startBirthdayJob(client: Client): void {
   new CronJob(
-    "0 8 * * *",
+    "30 0 * * * *",
     async () => {
-      console.log("🎂 Running birthday check...");
-
-      const now = DateTime.now().setZone(TIMEZONE);
-      const today = { day: now.day, month: now.month };
-
-      try {
-        const todaysBirthdays = await db
-          .select()
-          .from(birthdays)
-          .where(
-            and(eq(birthdays.day, today.day), eq(birthdays.month, today.month)),
-          );
-
-        for (const record of todaysBirthdays) {
-          await announceBirthday(
-            client,
-            record.guildId,
-            record.birthdayId,
-            record.year,
-          );
-        }
-      } catch (error) {
-        console.error("❌ Birthday job failed:", error);
-      }
+      await checkBirthdays(client);
     },
     null,
     true,
-    "Europe/Berlin",
+    "UTC",
   );
 
-  console.log("✅ Birthday job scheduled (daily at 08:00 Europe/Berlin).");
+  console.log("✅ Hourly birthday job scheduled.");
 }

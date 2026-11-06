@@ -3,10 +3,8 @@ import { eq, and } from "drizzle-orm";
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { BIRTHDAY_DATE_REGEX, BIRTHDAY_YEAR_REGEX } from "../../utils/regex";
-import { announceBirthday } from "../../jobs/birthdayJob";
+import { announceBirthday, toDateString } from "../../jobs/birthdayJob";
 import { DateTime } from "luxon";
-
-const TIMEZONE = "Europe/Berlin";
 
 export async function addInteraction(interaction: ModalSubmitInteraction) {
   if (!interaction.guildId) {
@@ -18,7 +16,8 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
 
   const dateStr = interaction.fields.getTextInputValue("date_input").trim();
   const yearStr = interaction.fields.getTextInputValue("year_input").trim();
-  const timezone = interaction.fields.getStringSelectValues("select_time_zone")[0]
+  const timezone =
+    interaction.fields.getStringSelectValues("select_time_zone")[0];
 
   const userId = interaction.user.id;
   const guildId = interaction.guildId;
@@ -105,11 +104,21 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
       flags: MessageFlags.Ephemeral,
     });
 
-    const now = DateTime.now().setZone(TIMEZONE);
-    const isToday = day === now.day && month === now.month;
+    const userTz = timezone || "UTC";
+    const nowInTz = DateTime.now().setZone(userTz);
+    const isToday = day === nowInTz.day && month === nowInTz.month;
 
     if (isToday) {
-      await announceBirthday(interaction.client, guildId, userId, year);
+      const todayString = toDateString(nowInTz);
+      if (existingBirthday?.lastDisplayedAt !== todayString) {
+        await announceBirthday(
+          interaction.client,
+          guildId,
+          userId,
+          year,
+          userTz,
+        );
+      }
     }
   } catch (error) {
     console.error("❌ Error saving birthday:", error);
