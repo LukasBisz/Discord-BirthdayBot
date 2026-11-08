@@ -13,6 +13,7 @@ import {
   toDateString,
 } from "../../jobs/birthdayJob";
 import { DateTime } from "luxon";
+import { logger } from "../../utils/logger";
 
 export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
   if (!interaction.guildId) {
@@ -70,11 +71,12 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
   }
 
   let displayName = `**${targetInput}**`;
+  let targetUser = null;
   if (DISCORD_ID_REGEX.test(targetInput)) {
-    const user = await interaction.client.users
+    targetUser = await interaction.client.users
       .fetch(targetInput)
       .catch(() => null);
-    if (user) displayName = `<@${user.id}>`;
+    if (targetUser) displayName = `<@${targetUser.id}>`;
   }
 
   try {
@@ -121,6 +123,24 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
       flags: MessageFlags.Ephemeral,
     });
 
+    const targetFormatted = targetUser
+      ? logger.formatUser(targetUser)
+      : logger.formatUser(targetInput, targetInput);
+
+    if (existingBirthday) {
+      logger.actionUpdate(
+        `Birthday updated | Target: ${targetFormatted} | Executed by: ${logger.formatUser(interaction.user)}`,
+      );
+    } else if (targetInput === interaction.user.id) {
+      logger.actionSelf(
+        `Birthday added | Target: ${targetFormatted} | Executed by: ${logger.formatUser(interaction.user)}`,
+      );
+    } else {
+      logger.actionAdd(
+        `Birthday added | Target: ${targetFormatted} | Executed by: ${logger.formatUser(interaction.user)}`,
+      );
+    }
+
     const userTz = timezone || "UTC";
     const nowInTz = DateTime.now().setZone(userTz);
     const isToday = isBirthdayToday(day, month, nowInTz);
@@ -138,7 +158,7 @@ export async function handleAdminAddModal(interaction: ModalSubmitInteraction) {
       }
     }
   } catch (error) {
-    console.error("❌ Error saving birthday:", error);
+    logger.error("Error saving birthday:", error);
     await interaction.reply({
       content: "❌ An error occurred while saving to the database.",
       flags: MessageFlags.Ephemeral,

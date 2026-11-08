@@ -7,6 +7,7 @@ import {
 import { eq } from "drizzle-orm";
 import { db } from "../../db/connection";
 import { configuration } from "../../db/schema";
+import { logger } from "../../utils/logger";
 
 export async function setupInteraction(
   interaction: ChannelSelectMenuInteraction,
@@ -48,7 +49,7 @@ export async function setupInteraction(
       components: [],
     });
   } catch (error) {
-    console.error("❌ Error saving birthday channel:", error);
+    logger.error("Error saving birthday channel:", error);
     await interaction.reply({
       content:
         "❌ An error occurred while saving the channel settings.",

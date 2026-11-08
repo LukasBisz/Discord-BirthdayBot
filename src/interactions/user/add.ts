@@ -9,6 +9,7 @@ import {
   toDateString,
 } from "../../jobs/birthdayJob";
 import { DateTime } from "luxon";
+import { logger } from "../../utils/logger";
 
 export async function addInteraction(interaction: ModalSubmitInteraction) {
   if (!interaction.guildId) {
@@ -108,6 +109,16 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
       flags: MessageFlags.Ephemeral,
     });
 
+    if (existingBirthday) {
+      logger.actionUpdate(
+        `Birthday updated | Target: ${logger.formatUser(interaction.user)}`,
+      );
+    } else {
+      logger.actionSelf(
+        `Birthday added | Target: ${logger.formatUser(interaction.user)}`,
+      );
+    }
+
     const userTz = timezone || "UTC";
     const nowInTz = DateTime.now().setZone(userTz);
     const isToday = isBirthdayToday(day, month, nowInTz);
@@ -125,7 +136,7 @@ export async function addInteraction(interaction: ModalSubmitInteraction) {
       }
     }
   } catch (error) {
-    console.error("❌ Error saving birthday:", error);
+    logger.error("Error saving birthday:", error);
     await interaction.reply({
       content:
         "❌ An error occurred while saving your birthday to the database.",

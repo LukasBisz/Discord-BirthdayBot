@@ -8,6 +8,7 @@ import {
 import { and, eq } from "drizzle-orm";
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
+import { logger } from "../../utils/logger";
 
 export async function handleRemoveCommand(
   interaction: ChatInputCommandInteraction,
@@ -91,12 +92,16 @@ export async function removeInteraction(interaction: ButtonInteraction) {
           ),
         );
 
+      logger.actionRemove(
+        `Birthday removed | Target: ${logger.formatUser(interaction.user)}`,
+      );
+
       return interaction.update({
         content: "🗑️ Your birthday has been deleted successfully.",
         components: [],
       });
     } catch (error) {
-      console.error("❌ Error deleting birthday:", error);
+      logger.error("Error deleting birthday:", error);
       return interaction.update({
         content: "❌ An error occurred while deleting your birthday.",
         components: [],

@@ -2,6 +2,7 @@ import { db } from "./connection";
 import { eq, and } from "drizzle-orm";
 import { birthdays, configuration } from "./schema";
 import { Client } from "discord.js";
+import { logger } from "../utils/logger";
 
 export async function initGuild(guildId: string): Promise<void> {
   try {
@@ -15,11 +16,11 @@ export async function initGuild(guildId: string): Promise<void> {
         guildId,
         setupComplete: false,
       });
-      console.log(`📝 Initialized configuration for guild (${guildId}).`);
+      logger.dbSync(`Initialized configuration for guild (${guildId}).`);
     }
   } catch (error) {
-    console.error(
-      `❌ Error creating configuration for guild (${guildId}):`,
+    logger.dbError(
+      `Error creating configuration for guild (${guildId}):`,
       error,
     );
   }
@@ -31,11 +32,11 @@ export async function syncGuild(client: Client): Promise<void> {
     for (const [guildId] of guilds) {
       await initGuild(guildId);
     }
-    console.log(
-      `✅ All guild configurations synchronized successfully (${guilds.size} guild(s)).`,
+    logger.dbSync(
+      `All guild configurations synchronized successfully (${guilds.size} guild(s)).`,
     );
   } catch (error) {
-    console.error("❌ Error synchronizing guild configurations:", error);
+    logger.dbError("Error synchronizing guild configurations:", error);
   }
 }
 
@@ -43,9 +44,9 @@ export async function cleanupGuild(guildId: string): Promise<void> {
   try {
     await db.delete(configuration).where(eq(configuration.guildId, guildId));
     await db.delete(birthdays).where(eq(birthdays.guildId, guildId));
-    console.log(`🧹 Data for guild (${guildId}) was cleaned up successfully.`);
+    logger.dbCleanup(`Data for guild (${guildId}) was cleaned up successfully.`);
   } catch (error) {
-    console.error(`❌ Error cleaning up data for guild (${guildId}):`, error);
+    logger.dbError(`Error cleaning up data for guild (${guildId}):`, error);
   }
 }
 
@@ -70,15 +71,15 @@ export async function cleanupMemberBirthday(
           and(eq(birthdays.guildId, guildId), eq(birthdays.birthdayId, userId)),
         );
 
-      const userTag = username ? `${username} (${userId})` : userId;
-      const guildTag = guildName ? `"${guildName}" (${guildId})` : guildId;
-      console.log(
-        `👋 Removed birthday for member ${userTag} who left guild ${guildTag}.`,
+      const userTag = logger.formatUser(username ?? userId, userId);
+      const guildTag = logger.formatGuild(guildName ?? guildId, guildId);
+      logger.dbCleanup(
+        `Removed birthday for member ${userTag} who left guild ${guildTag}.`,
       );
     }
   } catch (error) {
-    console.error(
-      `❌ Error removing birthday for member (${userId}) in guild (${guildId}):`,
+    logger.dbError(
+      `Error removing birthday for member (${userId}) in guild (${guildId}):`,
       error,
     );
   }

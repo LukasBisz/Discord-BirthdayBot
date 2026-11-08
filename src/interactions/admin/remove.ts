@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db/connection";
 import { birthdays } from "../../db/schema";
 import { DISCORD_ID_REGEX } from "../../utils/regex";
+import { logger } from "../../utils/logger";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -198,14 +199,25 @@ export async function handleAdminRemoveButton(interaction: ButtonInteraction) {
     );
 
     try {
+      const [recordToDelete] = await db
+        .select()
+        .from(birthdays)
+        .where(eq(birthdays.id, idToDelete));
+
       await db.delete(birthdays).where(eq(birthdays.id, idToDelete));
+
+      if (recordToDelete) {
+        logger.actionRemove(
+          `Birthday removed | Target: ${logger.formatUser(recordToDelete.birthdayId, recordToDelete.birthdayId)} | Executed by: ${logger.formatUser(interaction.user)}`,
+        );
+      }
 
       return interaction.update({
         content: "🗑️ The birthday has been deleted successfully.",
         components: [],
       });
     } catch (error) {
-      console.error("❌ Error deleting birthday:", error);
+      logger.error("Error deleting birthday:", error);
 
       return interaction.update({
         content: "❌ An error occurred while deleting the birthday.",

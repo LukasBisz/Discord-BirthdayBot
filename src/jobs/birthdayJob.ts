@@ -4,6 +4,7 @@ import { db } from "../db/connection";
 import { birthdays, configuration } from "../db/schema";
 import { eq, and } from "drizzle-orm";
 import { DateTime } from "luxon";
+import { logger } from "../utils/logger";
 
 export function toDateString(dt: DateTime): string {
   return dt.toISODate()!;
@@ -48,8 +49,8 @@ export async function announceBirthday(
     const todayString = toDateString(now);
 
     if (record?.lastDisplayedAt === todayString) {
-      console.log(
-        `⏭️ Already sent for user (${birthdayUserId}) today, skipping.`,
+      logger.cronWarn(
+        `Already sent for user (${birthdayUserId}) today, skipping.`,
       );
       return false;
     }
@@ -66,7 +67,7 @@ export async function announceBirthday(
       .limit(1);
 
     if (!config || !config.channelId) {
-      console.log(`⚠️ No setup found for guild (${guildId}), skipping.`);
+      logger.cronWarn(`No setup found for guild (${guildId}), skipping.`);
       return false;
     }
 
@@ -74,13 +75,13 @@ export async function announceBirthday(
       .fetch(config.channelId)
       .catch(() => null);
     if (!channel || !(channel instanceof TextChannel)) {
-      console.log(`⚠️ Channel (${config.channelId}) not accessible.`);
+      logger.cronWarn(`Channel (${config.channelId}) not accessible.`);
       return false;
     }
 
     const user = await client.users.fetch(birthdayUserId).catch(() => null);
     if (!user || !client.user) {
-      console.warn(`⚠️ Could not fetch user (${birthdayUserId}).`);
+      logger.cronWarn(`Could not fetch user (${birthdayUserId}).`);
       return false;
     }
 
@@ -123,13 +124,13 @@ export async function announceBirthday(
         ),
       );
 
-    console.log(
-      `✅ Sent birthday embed for: ${user.username} (${user.id}) in guild: ${channel.guild.name} (${guildId})`,
+    logger.cronSuccess(
+      `Sent birthday embed for: ${logger.formatUser(user)} in guild: ${logger.formatGuild(channel.guild)}`,
     );
     return true;
   } catch (error) {
-    console.error(
-      `❌ Failed to announce birthday for user (${birthdayUserId}):`,
+    logger.error(
+      `Failed to announce birthday for user (${birthdayUserId}):`,
       error,
     );
     return false;
@@ -137,7 +138,8 @@ export async function announceBirthday(
 }
 
 export async function checkBirthdays(client: Client): Promise<void> {
-  console.log("⏰ Running hourly timezone-based birthday check...");
+  const currentHour = DateTime.now().setZone("UTC").toFormat("HH:00");
+  logger.cronStart(`Starting hourly birthday check for hour ${currentHour} UTC...`);
 
   try {
     const allBirthdays = await db.select().from(birthdays);
@@ -168,7 +170,7 @@ export async function checkBirthdays(client: Client): Promise<void> {
       );
     }
   } catch (error) {
-    console.error("❌ Hourly birthday job failed:", error);
+    logger.error("Hourly birthday job failed:", error);
   }
 }
 
@@ -183,5 +185,5 @@ export function startBirthdayJob(client: Client): void {
     "UTC",
   );
 
-  console.log("✅ Hourly birthday job scheduled.");
+  logger.cronSuccess("Hourly birthday job scheduled.");
 }

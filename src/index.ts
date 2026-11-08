@@ -19,35 +19,31 @@ import {
 } from "./interactions/admin/remove";
 import { handleAdminAddModal } from "./interactions/admin/add";
 import { startBirthdayJob } from "./jobs/birthdayJob";
+import { logger } from "./utils/logger";
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
 });
 
 client.on("clientReady", async (c) => {
-  console.log("──────────────────────────────────────────────────────────");
   await connectToDatabase();
-  console.log("──────────────────────────────────────────────────────────");
   await registerCommands(client);
-  console.log("──────────────────────────────────────────────────────────");
   await syncGuild(client);
-  console.log("──────────────────────────────────────────────────────────");
   startBirthdayJob(client);
-  console.log(`✅ ${c.user.username} is online! 🤖`);
-  console.log("──────────────────────────────────────────────────────────");
+  logger.systemReady(`${c.user.username} is online! 🤖`);
 });
 
 client.on("guildCreate", async (guild) => {
-  console.log(`🚀 Joined new guild: "${guild.name}" (${guild.id})`);
+  logger.guildJoin(`Joined new guild: ${logger.formatGuild(guild)}`);
   if (client.user) {
-    await registerCommandsForGuild(guild.id, client.user.id);
+    await registerCommandsForGuild(guild.id, client.user.id, guild.name);
   }
   await initGuild(guild.id);
 });
 
 client.on("guildDelete", async (guild) => {
   const guildName = guild.name ?? "Unknown Guild";
-  console.log(`🤖 Bot was removed from guild: "${guildName}" (${guild.id})`);
+  logger.guildLeave(`Left guild: ${logger.formatGuild(guildName, guild.id)}`);
   await cleanupGuild(guild.id);
 });
 
