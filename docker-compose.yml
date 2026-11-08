@@ -1,5 +1,6 @@
 services:
   birthday-bot:
+    build: .
     image: ghcr.io/lukasbisz/discord-birthdaybot:latest
     container_name: discord-birthdaybot
     restart: unless-stopped

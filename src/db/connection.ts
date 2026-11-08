@@ -4,16 +4,26 @@ import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import * as schema from "./schema.js";
 import { config } from "../config.js";
 import { logger } from "../utils/logger";
+import fs from "fs";
+import path from "path";
 
-const dbPath = config.DATABASE_URL.replace("file:", "");
+let rawUrl = config.DATABASE_URL.replace(/^file:/, "");
+
+const dbPath = rawUrl.startsWith("/app/")
+  ? path.join(process.cwd(), rawUrl.replace(/^\/app\//, ""))
+  : rawUrl;
+
+const dir = path.dirname(dbPath);
+if (dir && dir !== "." && !fs.existsSync(dir)) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
 const sqlite = new Database(dbPath);
-
 export const db = drizzle(sqlite, { schema });
 
 export const connectToDatabase = async () => {
   try {
     migrate(db, { migrationsFolder: "./src/db/drizzle" });
-
     logger.dbSync("Connection to Database has been established successfully.");
     logger.dbSync("All models were synchronized successfully.");
   } catch (error) {
